@@ -1,0 +1,29 @@
+package main
+
+import (
+	"github.com/davidgardner11/hellotemporal/workflow"
+	"go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/client"
+	"log"
+)
+
+func main() {
+	c, err := client.NewClient(client.Options{}) 
+	if err != nil {
+		log.Fatalln("Unable to make client", err)
+	}
+
+	defer c.Close()
+
+	w := worker.New(c, "hello-world", worker.Options{})
+
+	w.RegisterWorkflow(helloworkflow.Workflow)
+	w.RegisterActivity(helloworkflow.Activity)
+
+	err = w.Run(worker.InterruptCh())
+	if err != nil {
+		log.Fatalln("Unable to start workflow", err)
+	}
+
+}
+
